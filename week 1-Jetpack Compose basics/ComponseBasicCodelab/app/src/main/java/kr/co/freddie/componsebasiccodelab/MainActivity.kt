@@ -70,8 +70,12 @@ fun MessageCard(msg: Message) {
                 style = MaterialTheme.typography.subtitle2
             )
             Spacer(modifier = Modifier.height(4.dp))
-            Surface(shape = MaterialTheme.shapes.medium, elevation = 1.dp, color = surfaceColor,
-            modifier = Modifier.animateContentSize().padding(1.dp)) {
+            Surface(
+                shape = MaterialTheme.shapes.medium, elevation = 1.dp, color = surfaceColor,
+                modifier = Modifier
+                    .animateContentSize()
+                    .padding(1.dp)
+            ) {
                 Text(
                     text = msg.body,
                     modifier = Modifier.padding(all = 4.dp),
