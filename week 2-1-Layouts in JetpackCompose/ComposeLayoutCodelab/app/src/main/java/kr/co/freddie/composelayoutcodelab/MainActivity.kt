@@ -37,12 +37,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun PhotographerCard(modifier: Modifier = Modifier) {
-    Row(modifier
-        .padding(8.dp)
-        .clip(RoundedCornerShape(4.dp))
-        .background(MaterialTheme.colors.surface)
-        .clickable(onClick = { /* skip */ })
-        .padding(16.dp)
+    Row(
+        modifier
+            .padding(8.dp)
+            .clip(RoundedCornerShape(4.dp))
+            .background(MaterialTheme.colors.surface)
+            .clickable(onClick = { /* skip */ })
+            .padding(16.dp)
     ) {
         Surface(
             modifier = Modifier.size(50.dp),
