@@ -13,27 +13,28 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.layout
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.*
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import kr.co.freddie.composelayoutcodelab.ui.theme.ComposeLayoutCodelabTheme
 
 class CustomLayoutActivity : ComponentActivity() {
+
+    private val topics = listOf(
+        "Arts & Crafts", "Beauty", "Books", "Business", "Comics", "Culinary",
+        "Design", "Fashion", "Film", "History", "Maths", "Music", "People", "Philosophy",
+        "Religion", "Social sciences", "Technology", "TV", "Writing"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeLayoutCodelabTheme {
-//                TextWithPaddingToBaselinePreview()
-//                TextWithNormalPaddingPreview()
-//                ChipPreview()
                 LayoutsCodelabPreview()
             }
         }
@@ -111,36 +112,52 @@ class CustomLayoutActivity : ComponentActivity() {
         }
     }
 
-    private fun Modifier.firstBaselineToTop(
-        firstBaselineToTop: Dp
-    ) = this.then(
-        layout { measurable, constraints ->
-            val placeable = measurable.measure(constraints)
+    @Stable
+    fun Modifier.padding(all: Dp) =
+        this.then(
+            PaddingModifier(start = all, top = all, end = all, bottom = all, rtlAware = true)
+        )
 
-            // Check the composable has a first baseline
-            check(placeable[FirstBaseline] != AlignmentLine.Unspecified)
-            val firstBaseline = placeable[FirstBaseline]
+    // Implementation detail
+    private class PaddingModifier(
+        val start: Dp = 0.dp,
+        val top: Dp = 0.dp,
+        val end: Dp = 0.dp,
+        val bottom: Dp = 0.dp,
+        val rtlAware: Boolean,
+    ) : LayoutModifier {
 
-            // Height of the composable with padding - first baseline
-            val placeableY = firstBaselineToTop.roundToPx() - firstBaseline
-            val height = placeable.height + placeableY
-            layout(placeable.width, height) {
-                placeable.placeRelative(0, placeableY)
+        override fun MeasureScope.measure(
+            measurable: Measurable,
+            constraints: Constraints
+        ): MeasureResult {
+
+            val horizontal = start.roundToPx() + end.roundToPx()
+            val vertical = top.roundToPx() + bottom.roundToPx()
+
+            val placeable = measurable.measure(constraints.offset(-horizontal, -vertical))
+
+            val width = constraints.constrainWidth(placeable.width + horizontal)
+            val height = constraints.constrainHeight(placeable.height + vertical)
+            return layout(width, height) {
+                if (rtlAware) {
+                    placeable.placeRelative(start.roundToPx(), top.roundToPx())
+                } else {
+                    placeable.place(start.roundToPx(), top.roundToPx())
+                }
             }
         }
-    )
-
-    private val topics = listOf(
-        "Arts & Crafts", "Beauty", "Books", "Business", "Comics", "Culinary",
-        "Design", "Fashion", "Film", "History", "Maths", "Music", "People", "Philosophy",
-        "Religion", "Social sciences", "Technology", "TV", "Writing"
-    )
+    }
 
 
     @Composable
     fun BodyContent(modifier: Modifier = Modifier) {
-        Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
-            StaggeredGrid(modifier = modifier, rows = 5) {
+        Row(modifier = modifier
+            .background(color = Color.LightGray, shape = RectangleShape)
+            .size(200.dp)
+            .padding(16.dp)
+            .horizontalScroll(rememberScrollState())) {
+            StaggeredGrid {
                 for (topic in topics) {
                     Chip(modifier = Modifier.padding(8.dp), text = topic)
                 }
@@ -153,30 +170,6 @@ class CustomLayoutActivity : ComponentActivity() {
     fun LayoutsCodelabPreview() {
         ComposeLayoutCodelabTheme {
             BodyContent()
-        }
-    }
-
-    @Preview
-    @Composable
-    fun ChipPreview() {
-        ComposeLayoutCodelabTheme {
-            Chip(text = "Hi there")
-        }
-    }
-
-    @Preview
-    @Composable
-    fun TextWithPaddingToBaselinePreview() {
-        ComposeLayoutCodelabTheme {
-            Text("Hi there!", Modifier.firstBaselineToTop(32.dp))
-        }
-    }
-
-    @Preview
-    @Composable
-    fun TextWithNormalPaddingPreview() {
-        ComposeLayoutCodelabTheme {
-            Text("Hi there!", Modifier.padding(top = 32.dp))
         }
     }
 }
