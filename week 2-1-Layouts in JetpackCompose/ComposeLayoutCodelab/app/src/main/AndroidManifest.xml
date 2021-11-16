@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ComposeLayoutCodelab">
         <activity
-            android:name=".CustomLayoutActivity"
+            android:name=".ConstraintLayoutActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.ComposeLayoutCodelab.NoActionBar">
